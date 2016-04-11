@@ -1,0 +1,113 @@
+class Graph
+  Vertex = Struct.new(:name, :neighbours, :dist, :prev)
+
+  def initialize(graph)
+    puts "pist"
+    @vertices = Hash.new{|h,k| h[k]=Vertex.new(k,[],Float::INFINITY)}
+    @edges = {}
+    graph.each do |(v1, v2, dist)|
+      @vertices[v1].neighbours << v2
+      @vertices[v2].neighbours << v1
+      @edges[[v1, v2]] = @edges[[v2, v1]] = dist
+      puts dist
+      print dist
+    end
+    @dijkstra_source = nil
+  end
+
+  def dijkstra(source)
+    return  if @dijkstra_source == source
+    q = @vertices.values
+    q.each do |v|
+      v.dist = Float::INFINITY
+      v.prev = nil
+      puts v
+    end
+    @vertices[source].dist = 0
+    until q.empty?
+      u = q.min_by {|vertex| vertex.dist}
+      puts u
+      puts 1
+      break if u.dist == Float::INFINITY
+      q.delete(u)
+      u.neighbours.each do |v|
+        puts v
+        vv = @vertices[v]
+        if q.include?(vv)
+          alt = u.dist + @edges[[u.name, v]]
+          if alt < vv.dist
+            vv.dist = alt
+            vv.prev = u.name
+          end
+        end
+      end
+    end
+    @dijkstra_source = source
+  end
+
+  def shortest_path(source, target)
+    dijkstra(source)
+    path = []
+    u = target
+    while u
+      puts "u"
+      path.unshift(u)
+      u = @vertices[u].prev
+    end
+    return path, @vertices[target].dist
+  end
+
+  def to_s
+    "#<%s vertices=%p edges=%p>" % [self.class.name, @vertices.values, @edges]
+  end
+end
+
+# require 'net/http'
+# puts Net::HTTP.get('google.com', '/index.html')
+
+
+def new_path
+  prime = [2, 3, 5, 7, 11, 13, 17, 19, 23]
+  use_random_seed Time.now.to_i
+  start, stop = :a, :e
+  g= Graph.new([[:a, :b, prime.choose],
+                [:a, :c, prime.choose],
+                [:a, :f, prime.choose],
+                [:b, :c, prime.choose],
+                [:b, :d, prime.choose],
+                [:c, :d, prime.choose],
+                [:c, :f, prime.choose],
+                [:d, :e, prime.choose],
+                [:e, :f, prime.choose],
+                ])
+
+  return g.shortest_path(start, stop)
+end
+
+define :dijkstra do
+  puts "dijkstra"
+  path, dist = new_path
+  puts path.join(" -> ")
+
+  start = Time.now.to_i
+
+  use_synth :fm
+  loop do
+    now = Time.now.to_i
+    if (path.length == 0)
+
+      if (now - start > 30)
+        return
+      else
+        path, dist = new_path
+        puts path.join(" -> ")
+        sleep 2
+      end
+    end
+    play path.shift, sustain: 2
+    sleep 2
+  end
+  sleep 4
+end
+
+dijkstra

@@ -1,0 +1,48 @@
+i = 1.0
+j = 1.0
+k = 1.0
+
+
+bizet_bass = (ring :d, :r, :r, :Bb, :g5, :r, :Bb, :r)
+
+use_debug false
+live_loop :beat do
+  sample :bd_gas, rate: (0.01 * ((i % 160) + 100)), attack: 0.01, release: 0.01, sustain: 0.5
+  i += 5
+  sleep 0.25
+end
+
+live_loop :pulse do
+  with_fx :slicer, phase: 0.125 * ((j % 7)+1) do
+    sample :ambi_glass_hum, rate: 1, sustain: 1, amp: 2.5
+  end
+  j += 2
+  sleep (0.4 * ((j % 7)+1))
+end
+
+# live_loop :melody do
+#   use_synth :hoover
+#   #play :c5, sustain: 4, amp: 0.25
+#   play (scale :e3, :major, num_octaves: 1).tick(:t1), attack: 0.25, release: 0.5, amp: 0.25
+#   k *= 2.0
+#   if (k >= 8.0)
+#     k = 1.0
+#   end
+#   sleep (4.0/k)
+# end
+
+
+with_fx :reverb, room: 1, mix: 0.3 do
+  live_loop :bizet do
+    # with_fx :slicer, phase: 0.125 do
+    #   synth :blade, note: (ring :d4, :d4, :d5, :d6).tick(:t1), release: 8,
+    #     cutoff: 100, amp: 0.15
+    # end
+    32.times do
+      tick
+      play bizet_bass.look, release: 0.1, amp: 0.15
+      play bizet_bass.look - 12, release: 0.3, amp: 0.15
+      sleep 0.3
+    end
+  end
+end

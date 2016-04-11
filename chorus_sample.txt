@@ -1,0 +1,29 @@
+with_sample_pack '/Applications/Sonic Pi.app/samples/sonatina/chorus' do
+  # puts Dir["/Applications/Sonic Pi.app/samples/sonatina/chorus"]
+
+  a = :chorus_male_a3
+  b = :chorus_male_b3
+  c = :chorus_male_c3
+  d = :chorus_male_d3
+  e = :chorus_male_e3
+  f = :chorus_male_f3
+  g = :chorus_male_g3
+  c2 = :chorus_male_c4
+  fea = :chorus_female_a5
+  feb = :chorus_female_b5
+  fec = :chorus_female_c5
+  fed = :chorus_female_d5
+  fee = :chorus_female_e5
+  fef = :chorus_female_f5
+  feg = :chorus_female_g5
+  fec2 = :chorus_female_c6
+
+
+  8.times do
+    tick
+    sample [c,d,e,f,g,a,b,c2].look, sustain: 2, release: 1
+    sample [fec,fed,fee,fef,feg,fea,feb,fec2].look, sustain: 2, release: 1
+
+    sleep 2
+  end
+end

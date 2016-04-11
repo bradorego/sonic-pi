@@ -1,0 +1,21 @@
+# sample :ambi_soft_buzz
+# sample :ambi_swoosh
+# sample :ambi_drone
+# sample :ambi_glass_hum
+# sample :ambi_glass_rub
+# sample :ambi_haunted_hum
+# sample :ambi_piano
+# sample :ambi_lunar_land, sustain: 4
+# sample :ambi_dark_woosh
+p_i = 0
+live_loop :choir do
+  with_fx :pitch_shift, pitch_slide: 1 do |r|
+    sample :ambi_choir, rate: 0.5, finish: 0.5
+    control r, pitch: p_i
+    sleep (sample_duration (:ambi_choir)) / 2.0
+    p_i += 1
+    if (p_i > 24)
+      p_i = 0
+    end
+  end
+end

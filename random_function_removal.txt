@@ -1,0 +1,41 @@
+# Welcome to Sonic Pi v2.9
+
+define :melody1 do
+  play 60, release: 0.5
+  sleep 0.5
+  play 60+5, release: 0.5
+  sleep 0.25
+  play 60+10, release: 0.5
+  sleep 1
+end
+
+
+define :melody2 do
+  play 60, release: 0.5
+  sleep 0.5
+  play 60-5, release: 0.5
+  sleep 0.25
+  play 60-10, release: 0.5
+  sleep 1
+end
+
+m_ring = (ring method(:melody1), method(:melody2))
+m_arry = [method(:melody1), method(:melody2),method(:melody1), method(:melody2),method(:melody1), method(:melody2)]
+
+m_index = 0
+
+live_loop :foo do
+  sync :bar
+  if (m_arry.empty?)
+    stop
+  end
+  m_index = rand_i(m_arry.length)
+  m_arry[m_index].call
+  m_arry.delete_at(m_index)
+  puts m_arry.length
+end
+
+live_loop :bar do
+  sample :bd_haus
+  sleep 1
+end

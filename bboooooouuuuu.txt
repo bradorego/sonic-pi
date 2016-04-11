@@ -1,0 +1,22 @@
+# i = 1
+
+# live_loop :vocal do
+#   if (i >= 16)
+#     i = 1
+#   end
+
+s = sample :ambi_choir, rate: 0.5, pitch: 12
+n = play 70, release: 5
+control n, note: 60, note_slide: 2
+
+
+live_loop :brrroooouuu do
+  a = play 70, release: 3
+  control a, note: 60, note_slide: 3
+  sleep 1
+end
+with_fx :slicer, phase: 1, phase_slide: 4 do |e|
+  use_synth :dsaw
+  play 50, sustain: 5
+  control e, phase: 0.05
+end

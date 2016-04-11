@@ -1,0 +1,26 @@
+live_loop :wat do
+  in_thread do
+    forty
+  end
+  in_thread do
+    seventy
+  end
+
+  sleep 2
+end
+
+define :seventy do
+  use_bpm 70
+
+  8.times do
+    play 70
+    sleep 1
+  end
+end
+
+define :forty do
+  use_bpm 40
+  8.times do  play 60
+    sleep 1
+  end
+end

@@ -1,0 +1,47 @@
+# 2m57s
+
+# 21 movements
+# 4 counts each
+# Sierra does each movement twice
+# 168 counts
+# plus 8 for nothing at the start
+# plus a 16 count fade
+# 192 times
+
+define :prime_seq do
+  puts "prime_seq"
+  puts 168 + 8 + 16
+
+  use_bpm 60
+
+  8.times do
+    sample :perc_snap, release: 0.5, amp: (line 0.5, 2, steps: 32).tick(:a1)
+    sleep 0.5
+  end
+
+  in_thread do
+    with_synth :blade do
+      42.times do
+        play 50, attack: 0.5, release: 1
+        sleep 2
+      end
+      4.times do
+        play 50, amp: (line 1, 0, steps: 4).tick(:a3)
+
+        sleep 2
+      end
+    end
+  end
+
+  168.times do
+    sample :perc_snap, release: 0.5, amp: 1
+    sleep 0.5
+  end
+  16.times do
+    sample :perc_snap, release: 0.5, amp: (line 2, 0, steps: 16).tick(:a2)
+    sleep 0.5
+  end
+end
+
+
+prime_seq

@@ -1,0 +1,336 @@
+# Intro
+def clicks
+  use_debug false
+  # sleep 2
+  with_synth :prophet do
+    2.times do
+      with_fx :lpf, cutoff: (line 110, 80, steps: 4).tick do
+        play 10, sustain: (line 6, 3, steps: 4).look, amp: 0.3
+        sleep 1.5
+      end
+    end
+  end
+end
+
+def static
+  use_debug false
+  with_synth :cnoise do
+    play 10, sustain: 6, amp: 0.05
+    play 20, sustain: 6, amp: 0.05
+    play 30, sustain: 6, amp: 0.05
+  end
+end
+
+def intro
+  use_debug false
+  dur = 2
+  with_synth :sine do #:dpulse
+    with_synth_defaults cutoff: 80, release: 2, amp: 0.5 do
+      with_bpm 80 do
+        6.times do
+          play [:e2, :a2, :d3, :g3, :c4, :f4].tick(:n1), sustain: [6*dur, 5*dur, 4*dur, 3*dur, 2*dur, 1*dur, 0].tick(:s1)
+          sleep dur
+        end
+        sample :ambi_choir, rate: 0.5, pitch: 14
+        sleep 1
+        sample :ambi_choir, rate: 0.5, pitch: 13
+      end
+    end
+  end
+end
+
+
+################################################################################
+# Interim
+################################################################################
+def ffscale(fadeIn, fadeOut)
+  use_debug false
+  maj = [:c3, :d3, :e3, :g3,:c4, :d4, :e4, :g4, :c5, :d5, :e5, :g5, :c6, :d6, :e6, :g6]
+  rev = maj.reverse
+  maj2 = [:a2, :b2, :c3, :e3, :a3, :b3, :c4, :e4, :a4, :b4, :c5, :e5, :a5, :b5, :c6, :e6]
+  rev2 = maj2.reverse
+  if (fadeIn)
+    amp = 0.05
+  else
+    amp = 0.55
+  end
+  fadeFactor = 0.025
+  in_thread do
+    16.times do
+      play maj.tick(:t1), amp: amp
+      sleep 0.25
+    end
+  end
+  16.times do
+    if (fadeIn)
+      amp = amp + fadeFactor
+    end
+    puts amp
+    sleep 0.25
+  end
+  play :c7, amp: amp
+  sleep 0.25
+  15.times do
+    play rev.tick(:t2), amp: amp
+    sleep 0.25
+  end
+  16.times do
+    play maj2.tick(:t3), amp: amp
+    sleep 0.25
+  end
+  play :a6, amp: amp
+  sleep 0.25
+  in_thread do
+    15.times do
+      play rev2.tick(:t4), amp: amp
+      sleep 0.25
+    end
+  end
+  15.times do
+    if (fadeOut)
+      amp = amp - fadeFactor
+    end
+    sleep 0.25
+  end
+  tick_reset(:t1)
+  tick_reset(:t2)
+  tick_reset(:t3)
+  tick_reset(:t4)
+end
+
+def interim(bpm, times)
+  #1m17s @ 50bpm
+  # start = Time.now.to_i
+  fadeIn = false
+  fadeOut = false
+  index = 0
+  in_thread do
+    with_bpm bpm do
+      times.times do
+        with_synth :pretty_bell do
+          release_ring = (line 0.25,2, steps: 4)
+          attack_ring = (line 0.01, 1, steps: 3)
+          attack_ring = (ring 0.05)
+          with_synth_defaults release: release_ring.tick(:r1), attack: attack_ring.look(:r1) do #(line 0.05, 16, steps: 8).tick(:l1), attack: (line 0.05, 4, steps: 8).tick(:l2) do
+            index == 0 ? fadeIn = true : fadeIn = false
+            index === (times - 1) ? fadeOut = true : fadeOut = false
+            ffscale(fadeIn, fadeOut)
+            index += 1
+          end
+        end
+      end
+    end
+  end
+  with_bpm bpm do
+    sleep (times * 16) - 2
+  end
+end
+################################################################################
+# Section I: Prime Search
+# 2m45s @ 58 bpm
+################################################################################
+def prime_seq
+  use_debug false
+  puts "Section I: Prime Search"
+  synths = (ring :blade, :piano, :tb303, :pulse, :mod_sine, :dpulse, :hoover, :dull_bell, :fm)
+  snap_amp = 0.5
+  note_amp = 0.5
+  drum_amp = 0.5
+  bass_amp = 0.25
+  fade = 0.1
+
+  use_bpm 58
+  in_thread do
+    12.times do
+      sample :perc_snap, release: 0.5, amp: (line fade, snap_amp, steps: 12).tick(:a1)
+      sleep 0.5
+    end
+
+    in_thread do # play random synths :)
+      with_synth :blade do
+        2.times do
+          play 50, attack: 0.5, release: 1, amp: note_amp
+          sleep 2
+        end
+        40.times do
+          use_random_seed Time.now.to_i
+          with_synth synths[rrand_i(0, synths.length)] do
+            play :c, attack: 0.5, release: 1, amp: note_amp
+            sleep 2
+          end
+        end
+        4.times do
+          play 50, amp: (line note_amp, fade, steps: 4).tick(:a3), attack: 0.5, release: 1
+          sleep 2
+        end
+      end
+    end
+
+    in_thread do # bass drum kick
+      344.times do
+        sample :drum_heavy_kick, amp: drum_amp if (spread 3, 8).tick
+        sleep 0.25
+      end
+    end
+    in_thread do # bass line
+      line1 = (chord :g1, :dim7)
+      line2 = (scale :g1, :major)
+      sleep 4
+      with_synth_defaults release: 0.25, amp: bass_amp do
+        19.times do
+          8.times do
+            play line1.tick(:line1)
+            sleep 0.25
+          end
+          8.times do
+            play line2.tick(:line2)
+            sleep 0.25
+          end
+        end
+      end
+    end
+
+    152.times do # metronome
+      sample :perc_snap, release: 0.5, amp: snap_amp
+      sleep 0.5
+    end
+    16.times do
+      sample :perc_snap, release: 0.5, amp: (line snap_amp, fade, steps: 16).tick(:a2)
+      sleep 0.5
+    end
+  end
+  sleep 97
+end
+
+################################################################################
+# 2m55s @ 52 bpm
+# Section II: Tree Traversal
+################################################################################
+def tree_traversal
+  with_bpm 52 do
+    use_debug false
+    puts "Section II: Tree Traversal"
+    in_thread do
+      50.times do
+        # with_fx :reverb, mix: 0.3, room: 0.5, damp: 0.8, pre_amp: 2 do
+        with_fx :gverb, room: 20, ref_level: 0.3, tail_level: 0.2, release: 0.8, mix: 1 do
+          sample :bd_fat, amp: 1, cutoff: 100
+          sleep 0.25
+          sample :bd_fat, amp: 1, cutoff: 100
+          sleep 1.75
+        end
+      end
+    end
+
+    in_thread do
+      sleep 4
+      22.times do
+        use_random_seed Time.now.to_i
+        s = scale(:c, :major, num_octaves: 2).shuffle
+        7.times do
+          play s.tick, amp: 0.5, release: 0.5, attack: 0.02
+          sleep 0.5
+        end
+        sleep 0.5
+        # sleep 2
+      end
+    end
+    # ending
+    in_thread do
+      sleep 92
+      use_random_seed Time.now.to_i
+      s = scale(:e4, :major).shuffle
+      7.times do
+        play s.tick, amp: (line 0.5, 0.05, steps: 7).tick(:l1), release: 0.5, attack: 0.02
+        sleep 0.5
+      end
+    end
+    sleep 99.5
+  end
+end
+
+################################################################################
+# Section III: Dijkstra's (2m40s @ 50bpm)
+################################################################################
+def dijkstra
+  use_debug false
+  puts "Section III: Dijkstra's"
+  note_amp = 0.2
+
+  index = 0
+  notes = (ring 72, 58, 52, 66, 64)
+  in_thread do
+    with_fx :reverb, mix: 0.5 do
+      sleep 5
+      36.times do # ocean
+        s = synth [:bnoise, :cnoise, :gnoise].choose, amp: 0.5, attack: rrand(0, 4), sustain: rrand(0, 2), release: rrand(1, 5), cutoff_slide: rrand(0, 5), cutoff: rrand(60, 100), pan: rrand(-1, 1), pan_slide: rrand(1, 5), amp: 0.05
+        control s, pan: rrand(-1, 1), cutoff: rrand(60, 110)
+        sleep rrand(2, 4)
+      end
+    end
+  end
+  # in_thread do
+  #   noiseNotes = (ring :b2, :g2, :f2, :e2, :c2, :d2, :a2)
+  #   sleep 8
+  #   64.times do #noise
+  #     play noiseNotes.tick(:notes1), amp: 0.125 if (spread 3, 5).tick(:spread1)
+  #     sample :drum_cymbal_soft, amp: 0.125 if (spread 3, 5).tick
+  #     sleep 0.25
+  #   end
+  # end
+  in_thread do
+    with_bpm 50 do
+      32.times do #main
+        # if (index % 5 == 0)
+        #   sample :ambi_choir, sustain: 0.25, release: 0.25, attack: 0.25, amp: 0.5
+        # else
+        #   sample :drum_snare_soft, sustain: 0.25, release: 0.05, amp: 0.5
+        # end
+        # s = scale (:a, :major).choose(5)
+        # play s.tick, sustain: 0.5
+        5.times do
+          play notes.tick(:p1), release: 0.25, attack: 0.1, amp: note_amp
+          sleep 0.5
+        end
+        index = index+1
+        # puts index
+      end
+      2.times do
+        5.times do
+          play notes.tick(:p1), release: 0.25, attack: 0.1, amp: (line note_amp, 0.05, steps: 9).tick(:amp1)
+          sleep 0.5
+        end
+      end
+    end
+  end
+  sleep 96
+end
+
+################################################################################
+# Main
+################################################################################
+start = Time.now.to_i
+use_random_seed Time.now.to_i
+m_arry = [method(:prime_seq), method(:tree_traversal), method(:dijkstra)]
+
+in_thread do
+  static
+end
+clicks
+intro
+interim 36, 2
+dur = Time.now.to_i - start
+puts (dur / 60.0).round(0).to_s + "m" + (dur%60).to_s+"s"
+3.times do
+  m_index = 0
+  if (m_arry.empty?)
+    stop
+  end
+  m_index = rand_i(m_arry.length)
+  m_arry[m_index].call
+  m_arry.delete_at(m_index)
+  puts m_arry.length
+  interim [64, 128, 256].tick(:b1), [2,4,8].tick(:i1)
+  dur = Time.now.to_i - start
+  puts (dur / 60.0).round(0).to_s + "m" + (dur%60).to_s+"s"
+end

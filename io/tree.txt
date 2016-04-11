@@ -1,0 +1,30 @@
+# 2m20s
+
+use_bpm 60
+define :tree_traversal do
+  puts "tree_traversal"
+  in_thread do
+    48.times do
+      with_fx :reverb, mix: 0.3, room: 0.5, damp: 0.8, pre_amp: 2 do
+        sample :bd_fat, amp: 3, cutoff: 100
+        sleep 0.25
+        sample :bd_fat, amp: 3, cutoff: 100
+        sleep 1.75
+      end
+    end
+  end
+
+  sleep 4
+  23.times do
+    use_random_seed Time.now.to_i
+    s = scale(:e3, :major).shuffle
+    7.times do
+      play s.tick
+      sleep 0.5
+    end
+    sleep 0.5
+    # sleep 2
+  end
+end
+
+tree_traversal

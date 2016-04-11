@@ -1,0 +1,8 @@
+# whistle/alarm.rb
+use_synth :tri
+with_fx :hpf, cutoff: 120 do
+  with_fx :ixi_techno, mix: 1, phase: 4, cutoff_min: 80, cutoff_max: 100, res:0.999999 do
+    play 60, release: 6, amp: 2
+    sleep 4
+  end
+end

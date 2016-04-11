@@ -1,0 +1,129 @@
+use_debug false
+
+fib_seq =   [1, 1, 2, 3, 5, 8, 13, 21]
+prime_seq = [2, 3, 5, 7, 11, 13, 17, 19]
+
+# Welcome to Sonic Pi v2.9
+define :arp do
+  puts "arp"
+  # sync :bar
+  64.times do
+    #play (choose((scale :e3, :minor_pentatonic))), release: 0.1
+    play (scale :e3, :minor_pentatonic, num_octaves: 1).tick(:t1), release: 0.1
+    sleep choose( [0.115, 0.25, 0.33])
+    play (scale :e4, :minor_pentatonic, num_octaves: 3).tick(:t3), release: 0.25
+    sleep choose( [0.115, 0.25, 0.33])#(ring 0.115, 0.25, 0.33).tick(:t2)
+  end
+end
+
+seed_ring = (ring 12, 45, 443)
+
+define :rand_surfer do
+  puts "rand_surfer"
+  64.times do
+    # sync :bar
+    use_random_seed seed_ring.tick
+    use_synth :dsaw
+    notes = (scale :e2, :minor_pentatonic, num_octaves: 3)
+    7.times do
+      play notes.choose, release: 0.1, cutoff: rrand(70, 120)
+      sleep 0.125
+    end
+  end
+end
+define :random_riff do
+  puts "random_riff"
+  in_thread do
+    64.times do
+      use_synth :saw
+      # sync :bar
+      use_random_seed 30
+      notes = (scale :e3, :minor_pentatonic).shuffle
+      16.times do
+        play notes.tick, release: 0.2, cutoff: 90 if one_in(2)
+        sleep 0.125
+      end
+    end
+  end
+
+  64.times do
+    use_synth :dsaw
+    # sync :bar
+    use_random_seed 300
+    notes = (scale :e3, :minor_pentatonic).shuffle
+    16.times do
+      play notes.tick, release: 0.2, cutoff: 90 if one_in(2)
+      sleep 0.125
+    end
+  end
+end
+
+define :melodies do
+  if one_in(2)
+    m_i = 0
+    ([4, 8, 8, 16].choose).times do
+      play 60, release: 0.5
+      sleep 0.25
+      play 60+m_i, release: 0.5
+      sleep 0.125
+      play 60+(2*m_i), release: 0.5
+      sleep 0.5
+      m_i += 1;
+    end
+  else
+    m_j = 0
+    ([4, 8, 8, 16].choose).times do
+      play 60, release: 0.5
+      sleep 0.25
+      play 60-m_j, release: 0.5
+      sleep 0.125
+      play 60-(2*m_j), release: 0.5
+      sleep 0.5
+      m_j +=1
+    end
+  end
+end
+
+m_ring = (ring method(:arp), method(:rand_surfer), method(:random_riff), method(:melodies))
+m_arry = []
+m_arry_template = [method(:arp), method(:rand_surfer),method(:random_riff), method(:melodies)]
+
+m_index = 0
+
+live_loop :ring do
+  # sync :bar
+  if (m_arry.empty?)
+    m_arry = m_arry_template.dup
+  end
+  m_index = rand_i(m_arry.length)
+  m_arry[m_index].call
+  m_arry.delete_at(m_index)
+  puts m_arry.length
+end
+
+# live_loop :foo do
+#   sync :bar
+#   if (m_arry.empty?)
+#     stop
+#   end
+#   m_index = rand_i(m_arry.length)
+#   m_arry[m_index].call
+#   m_arry.delete_at(m_index)
+#   puts m_arry.length
+# end
+
+# live_loop :bar do
+#   #sample :bd_haus
+#   sleep 0.5
+# end
+
+define :arp2 do
+  use_synth (ring :tb303, :blade, :prophet, :saw, :beep, :tri).tick(:t1)
+  29.times do
+    play (scale :e1, :major, num_octaves: 4).tick(:t2), release: 0.25, amp: 0.25
+    sleep 0.125
+  end
+end
+live_loop :arp do
+  arp2
+end

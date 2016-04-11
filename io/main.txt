@@ -1,0 +1,134 @@
+# Section I: Prime Search
+# 2m45s @ 58 bpm
+define :prime_seq do
+  # 21 movements
+  # 4 counts each
+  # Sierra does each movement twice
+  # 168 counts
+  # plus 12 for nothing at the start
+  # plus a 16 count fade
+  # 196 times
+  use_debug false
+  start = Time.now.to_i
+  puts "Section I: Prime Search"
+  with_bpm 58 do
+    12.times do
+      sample :perc_snap, release: 0.5, amp: (line 0.5, 1, steps: 32).tick(:a1)
+      sleep 0.5
+    end
+    in_thread do
+      with_synth :blade do
+        42.times do
+          play 50, attack: 0.5, release: 1
+          sleep 2
+        end
+        4.times do
+          play 50, amp: (line 1, 0.1, steps: 4).tick(:a3), attack: 0.5, release: 1
+          sleep 2
+        end
+      end
+    end
+    168.times do
+      sample :perc_snap, release: 0.5, amp: 1
+      sleep 0.5
+    end
+    16.times do
+      sample :perc_snap, release: 0.5, amp: (line 1, 0.1, steps: 16).tick(:a2)
+      sleep 0.5
+    end
+    sleep 4
+    dur = Time.now.to_i - start
+    puts (dur / 60.0).round(0).to_s + "m" + (dur%60).to_s+"s"
+  end
+end
+
+# Section III: Dijkstra's
+# 2m40s @ 50bpm
+def dijkstra3
+  use_debug false
+  puts "Section III: Dijkstra's"
+  start = Time.now.to_i
+  index = 0
+  notes = (ring 67, 53, 47, 61, 59)
+  with_bpm 50 do
+    32.times do
+      # if (index % 5 == 0)
+      #   sample :ambi_choir, sustain: 0.25, release: 0.25, attack:0.25, amp: 0.5
+      # else
+      #   sample :drum_snare_soft, sustain: 0.25, release: 0.05, amp: 0.5
+      # end
+      # s = scale (:a, :major).choose(5)
+      # play s.tick, sustain: 0.5
+      5.times do
+        play notes.tick(:p1), release: 0.25
+        sleep 0.5
+      end
+      index = index+1
+      puts index
+    end
+  end
+  dur = Time.now.to_i - start
+  puts (dur / 60.0).round(0).to_s + "m" + (dur%60).to_s+"s"
+  sleep 4
+end
+
+# 2m55s @ 52 bpm
+# Section II: Tree Traversal
+define :tree_traversal do
+  use_debug false
+  puts "Section II: Tree Traversal"
+  start = Time.now.to_i
+  with_bpm 52 do
+    in_thread do
+      50.times do
+        with_fx :reverb, mix: 0.3, room: 0.5, damp: 0.8, pre_amp: 2 do
+          sample :bd_fat, amp: 1, cutoff: 100
+          sleep 0.25
+          sample :bd_fat, amp: 1, cutoff: 100
+          sleep 1.75
+        end
+      end
+    end
+
+    sleep 4
+    22.times do
+      use_random_seed Time.now.to_i
+      s = scale(:e4, :major).shuffle
+      7.times do
+        play s.tick, amp: 0.5, release: 0.5, attack: 0.02
+        sleep 0.5
+      end
+      sleep 0.5
+      # sleep 2
+    end
+    # ending
+    use_random_seed Time.now.to_i
+    s = scale(:e4, :major).shuffle
+    7.times do
+      play s.tick, amp: (line 0.5, 0.05, steps: 7).tick(:l1), release: 0.5, attack: 0.02
+      sleep 0.5
+    end
+    sleep 4
+    dur = Time.now.to_i - start
+    puts (dur / 60.0).round(0).to_s + "m" + (dur%60).to_s+"s"
+  end
+end
+
+
+
+start = Time.now.to_i
+use_random_seed Time.now.to_i
+m_arry = [method(:prime_seq), method(:tree_traversal), method(:dijkstra3)]
+3.times do
+  m_index = 0
+  if (m_arry.empty?)
+    stop
+  end
+  m_index = rand_i(m_arry.length)
+  m_arry[m_index].call
+  m_arry.delete_at(m_index)
+  puts m_arry.length
+  dur = Time.now.to_i - start
+  puts (dur / 60.0).round(0).to_s + "m" + (dur%60).to_s+"s"
+  sleep 4
+end

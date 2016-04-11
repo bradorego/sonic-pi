@@ -1,0 +1,25 @@
+s_arry = [:chinese, :egyptian, :gong, :hirajoshi, :iwato, :messiaen5, :pelog, :prometheus, :ritusen, :scriabin]
+
+start = Time.now.to_i
+
+l = in_thread do
+  with_bpm 80 do
+    with_synth :mod_sine do
+      loop do
+        use_random_seed Time.now.to_i
+        notes = (scale :a2, s_arry.choose, num_octaves: 1)
+
+        now = Time.now.to_i
+        play notes.tick(:n1), release: 0.75, amp: 0.05, cutoff: 55
+        sleep 0.25
+        if (now - start > 480)
+          l.kill
+        end
+      end
+    end
+  end
+end
+# sleep 4
+# l.kill
+# sleep 0.75
+# play 60, sustain: 5

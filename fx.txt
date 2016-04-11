@@ -1,0 +1,41 @@
+# Welcome to Sonic Pi v2.9
+use_bpm 120
+# live_loop :timbre do
+#   use_synth (ring :tb303, :blade, :prophet, :saw, :beep, :tri).tick(:t1)
+#   play :e2, attack: 0, release: 2, cutoff: 80
+#   sleep 0.5
+# end
+
+# live_loop :riff do
+#   use_synth (ring :tb303, :blade, :prophet, :saw, :beep, :tri).tick(:t1)
+#   riff = (ring :e3, :e3, :r, :g3, :r, :r, :r, :a3)
+#   play riff.tick(:t2), release: 0.5, cutoff: 80
+#   sleep 0.25
+# end
+
+live_loop :random_riff do
+  use_synth :dsaw
+  use_random_seed 4
+  # with_fx :bitcrusher, sample_rate: 44100, bits: 1, cutoff: 90 do
+  # with_fx :distortion, distort: 0.7 do
+  # with_fx :echo, phase: 1, decay: 0.5 do
+  # with_fx :flanger, phase: 0.5, depth: 20, feedback: 0.6  do
+  # with_fx :gverb, mix: 1, room: 4, ref_level: 7, tail_level: 0 do
+  # notes = (scale :e3, :minor_pentatonic, num_octave: 2).shuffle
+  # play notes.tick, release: 0.25, cutoff: 80
+  # with_fx :hpf, cutoff: 110 do
+  # with_fx :ixi_techno, mix: 1, phase: 4, cutoff_min: 80, cutoff_max: 100, res:0.999999 do
+  # with_fx :panslicer, mix: 1, phase: 0.5, pulse_width: 0.8, smooth: 0.5 do
+  # with_fx :reverb, mix: 1, room: 0.9999 do
+
+  # with_fx :ring_mod, freq: 30 , mod_amp: 2 do
+
+  # with_fx :slicer, amp_min: 0, amp_max: 2, phase: 1, smooth_down: 0.5 do
+  # with_fx :tanh, krunch: 2, pre_amp: 2 do
+  with_fx :wobble, mix: 1, phase: 1, cutoff_min: 60, cutoff_max: 120, smooth_down: 2, smooth_up: 1 do
+    play 60, sustain: 3
+    sleep 4
+  end
+
+
+end

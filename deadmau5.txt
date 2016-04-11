@@ -1,0 +1,25 @@
+use_synth :saw
+use_synth_defaults release: 0.1
+use_bpm 127
+live_loop :deadmau5 do
+  play chord(:a, :minor), sustain: 3.75
+  sleep 3.75
+  play chord(:f), sustain: 3.75
+  sleep 3.75
+  play chord(:f), sustain: 1.75
+  sleep 1.75
+  play chord(:g), sustain: 2
+  sleep 2
+  play chord(:a, :major), sustain: 3.75
+  sleep 3.75
+  play chord(:a, :minor), sustain: 3.75
+  sleep 3.75
+  play chord(:f), sustain: 3.75
+  sleep 3.75
+  play chord(:f), sustain: 1.75
+  sleep 1.75
+  play chord(:gs4), sustain: 2
+  sleep 2
+  play chord(:a), sustain: 3.75
+  sleep 3.75
+end
